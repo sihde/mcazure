@@ -1,0 +1,3 @@
+Package: *
+Pin: origin repos.azul.com
+Pin-Priority: 100
