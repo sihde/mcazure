@@ -7,6 +7,7 @@ cp zulu /etc/apt/preferences.d/zulu
 mkdir -p /usr/local/share/keyrings
 cp RPM-GPG-KEY-azulsystems /usr/local/share/keyrings
 
-apt update
-apt install zulu8-jre-headless
-
+apt-get update
+apt-get -y upgrade
+apt-get -y install zulu8-jre-headless
+apt-get -y autoremove --purge
