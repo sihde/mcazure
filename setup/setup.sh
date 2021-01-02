@@ -13,7 +13,7 @@ apt-get -y install zulu8-jre-headless emacs-nox
 apt-get -y autoremove --purge
 
 adduser --disabled-login --quiet --home /srv/minecraft --no-create-home minecraft --gecos ""
-mkdir /srv
+mkdir -p /srv
 
 # Add mount point for home directory
 cat >> /etc/fstab <<EOF
