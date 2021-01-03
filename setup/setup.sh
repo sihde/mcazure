@@ -2,10 +2,17 @@
 
 set -e
 
+# Timezone
+ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+dpkg-reconfigure -f noninteractive tzdata
+
+# Zulu JRE repository
 cp zulu.list /etc/apt/sources.list.d/
 cp zulu /etc/apt/preferences.d/
 mkdir -p /usr/local/share/keyrings
 cp RPM-GPG-KEY-azulsystems /usr/local/share/keyrings/
+
+# Minecraft systemd configuration
 cp minecraft@.service /etc/systemd/system/
 systemctl enable minecraft@1.16.4.service
 
@@ -14,6 +21,7 @@ apt-get -y upgrade --with-new-pkgs
 apt-get -y install zulu8-jre-headless
 apt-get -y autoremove --purge
 
+# Create user
 adduser --disabled-login --quiet --home /srv/minecraft --no-create-home minecraft --gecos ""
 mkdir -p /srv
 
