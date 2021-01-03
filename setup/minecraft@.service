@@ -3,7 +3,7 @@ Description=Minecraft %i Server
 After=network.target
 
 [Service]
-Type=forking
+Type=simple
 User=minecraft
 Group=minecraft
 WorkingDirectory=/srv/minecraft/%i
@@ -13,8 +13,8 @@ ReadWritePaths=/run/screen /srv/minecraft/common /srv/minecraft/%i
 PrivateTmp=true
 #NoNewPrivileges=true
 ExecStart=/srv/minecraft/mc.sh start %i
-PIDFile=/srv/minecraft/%i/mc.pid
-#ExecStop=/srv/minecraft/mc.sh stop %i
+#PIDFile=/srv/minecraft/%i/mc.pid
+ExecStop=/srv/minecraft/mc.sh stop %i
 SuccessExitStatus=143
 
 [Install]
