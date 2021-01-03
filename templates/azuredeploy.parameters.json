@@ -13,6 +13,12 @@
         },
         "vmSize": {
             "value": "Standard_F4s_v2"
+        },
+        "diskResourceGroup": {
+            "value": "mc-storage"
+        },
+        "diskResourceName": {
+            "value": "minecraft-datadisk1"
         }
     }
 }

@@ -33,6 +33,25 @@
       "metadata": {
         "description": "description"
       }
+    },
+    "diskSubscription": {
+      "type": "string",
+      "defaultValue": "[subscription().subscriptionId]",
+      "metadata": {
+        "description": "Resource Group for persistent storage disk"
+      }
+    },
+    "diskResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource Group for persistent storage disk"
+      }
+    },
+    "diskResourceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource Name for persistent storage disk"
+      }
     }
   },
   "variables": {
@@ -40,67 +59,13 @@
     "vNetAddressPrefixes": "10.0.0.0/16",
     "vNetSubnetName": "default",
     "vNetSubnetAddressPrefix": "10.0.0.0/24",
-    "diskName": "[concat(parameters('projectName'), '-datadisk1')]",
     "vmName": "[concat(parameters('projectName'), '-vm')]",
     "publicIPAddressName": "[concat(parameters('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(parameters('projectName'), '-nic')]",
-    "networkSecurityGroupName": "[concat(parameters('projectName'), '-nsg')]",
-    "networkSecurityGroupName2": "[concat(variables('vNetSubnetName'), '-nsg')]"
+    "vNetNSGName": "[concat(variables('vNetSubnetName'), '-nsg')]",
+    "diskId": "[resourceId(parameters('diskSubscription'), parameters('diskResourceGroup'), 'Microsoft.Compute/disks', parameters('diskResourceName'))]"
   },
   "resources": [
-    {
-        "type": "Microsoft.Compute/disks",
-        "apiVersion": "2020-06-30",
-        "name": "[variables('diskName')]",
-        "location": "[resourceGroup().location]",
-        "sku": {
-            "name": "StandardSSD_LRS"
-        },
-        "properties": {
-            "creationData": {
-                "createOption": "Empty"
-            },
-            "diskSizeGB": 16
-        }
-    },
-    {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2020-05-01",
-      "name": "[variables('networkSecurityGroupName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "ssh_rule",
-            "properties": {
-              "description": "Locks inbound down to ssh default port 22.",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "22",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 123,
-              "direction": "Inbound"
-            }
-          },
-          {
-            "name": "minecraft_rule",
-            "properties": {
-              "description": "Minecraft server port",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "25565",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 200,
-              "direction": "Inbound"
-            }
-          }
-        ]
-      }
-    },
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2020-05-01",
@@ -120,12 +85,12 @@
       "comments": "Simple Network Security Group for subnet [variables('vNetSubnetName')]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2020-05-01",
-      "name": "[variables('networkSecurityGroupName2')]",
+      "name": "[variables('vNetNSGName')]",
       "location": "[parameters('location')]",
       "properties": {
         "securityRules": [
           {
-            "name": "default-allow-22",
+            "name": "ssh",
             "properties": {
               "priority": 1000,
               "access": "Allow",
@@ -135,6 +100,20 @@
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*"
+            }
+          },
+          {
+            "name": "minecraft",
+            "properties": {
+              "description": "Minecraft server port",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "25565",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
             }
           }
         ]
@@ -146,7 +125,7 @@
       "name": "[variables('vNetName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
+        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vNetNSGName'))]"
       ],
       "properties": {
         "addressSpace": {
@@ -160,7 +139,7 @@
             "properties": {
               "addressPrefix": "[variables('vNetSubnetAddressPrefix')]",
               "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName2'))]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vNetNSGName'))]"
               }
             }
           }
@@ -174,8 +153,7 @@
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -200,8 +178,7 @@
       "name": "[variables('vmName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
-        "[resourceId('Microsoft.Compute/disks', variables('diskName'))]"
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
       ],
       "properties": {
         "hardwareProfile": {
@@ -235,13 +212,13 @@
           "dataDisks": [
             {
                 "lun": 0,
-                "name": "[variables('diskName')]",
+                "name": "[parameters('diskResourceName')]",
                 "createOption": "attach",
                 "managedDisk": {
-                "id": "[resourceId('Microsoft.Compute/disks/', variables('diskName'))]"
+                  "id": "[variables('diskId')]"
+                }
             }
-          }
-        ]
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
