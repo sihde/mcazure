@@ -7,6 +7,7 @@ cp zulu /etc/apt/preferences.d/
 mkdir -p /usr/local/share/keyrings
 cp RPM-GPG-KEY-azulsystems /usr/local/share/keyrings/
 cp minecraft@.service /etc/systemd/system/
+systemctl enable minecraft@1.16.4.service
 
 apt-get update
 apt-get -y upgrade --with-new-pkgs
