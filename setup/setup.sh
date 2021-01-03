@@ -2,10 +2,11 @@
 
 set -e
 
-cp zulu.list /etc/apt/sources.list.d/zulu.list
-cp zulu /etc/apt/preferences.d/zulu
+cp zulu.list /etc/apt/sources.list.d/
+cp zulu /etc/apt/preferences.d/
 mkdir -p /usr/local/share/keyrings
-cp RPM-GPG-KEY-azulsystems /usr/local/share/keyrings
+cp RPM-GPG-KEY-azulsystems /usr/local/share/keyrings/
+cp minecraft@.service /etc/systemd/system/
 
 apt-get update
 apt-get -y upgrade --with-new-pkgs
