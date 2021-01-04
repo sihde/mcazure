@@ -12,6 +12,11 @@ cp zulu /etc/apt/preferences.d/
 mkdir -p /usr/local/share/keyrings
 cp RPM-GPG-KEY-azulsystems /usr/local/share/keyrings/
 
+# Azure CLI repo
+cp azure-cli.list /etc/apt/sources.list.d/
+cp azure-cli /etc/apt/preferences.d/
+cp microsoft.gpg /usr/local/share/keyrings/
+
 # Minecraft systemd configuration
 cp minecraft@.service /etc/systemd/system/
 systemctl enable minecraft@1.16.4.service
