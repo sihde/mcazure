@@ -24,7 +24,7 @@ systemctl add-wants multi-user.target minecraft@1.16.4.service
 
 apt-get update
 apt-get -y upgrade --with-new-pkgs
-apt-get -y install zulu8-jre-headless
+apt-get -y install zulu8-jre-headless azure-cli
 apt-get -y autoremove --purge
 
 # Create user
@@ -35,3 +35,8 @@ mkdir -p /srv
 cat >> /etc/fstab <<EOF
 UUID=e0698c68-30d0-482a-9615-a6278be757b4 /srv ext4 defaults 0 2
 EOF
+
+# Log in with user-assigned managed identity
+az login --allow-no-subscriptions --identity -u '/subscriptions/32c8a58f-efa7-4fee-8245-180c4c11257b/resourceGroups/mc-storage/providers/Microsoft.ManagedIdentity/userAssignedIdentities/hamachi-mc-id'
+
+# TODO: download ssh host keys
