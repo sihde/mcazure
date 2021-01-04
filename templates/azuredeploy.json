@@ -34,23 +34,29 @@
         "description": "description"
       }
     },
-    "diskSubscription": {
+    "persistentSubscriptionId": {
       "type": "string",
       "defaultValue": "[subscription().subscriptionId]",
       "metadata": {
-        "description": "Resource Group for persistent storage disk"
+        "description": "Sub ID for persistent stuff"
       }
     },
-    "diskResourceGroup": {
+    "persistentResourceGroup": {
       "type": "string",
       "metadata": {
-        "description": "Resource Group for persistent storage disk"
+        "description": "Resource Group for persistent stuff"
       }
     },
     "diskResourceName": {
       "type": "string",
       "metadata": {
         "description": "Resource Name for persistent storage disk"
+      }
+    },
+    "managedIdentityName": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource Name for mananged identity"
       }
     }
   },
@@ -63,7 +69,9 @@
     "publicIPAddressName": "[concat(parameters('projectName'), '-ip')]",
     "networkInterfaceName": "[concat(parameters('projectName'), '-nic')]",
     "vNetNSGName": "[concat(variables('vNetSubnetName'), '-nsg')]",
-    "diskId": "[resourceId(parameters('diskSubscription'), parameters('diskResourceGroup'), 'Microsoft.Compute/disks', parameters('diskResourceName'))]"
+    "diskId": "[resourceId(parameters('persistentSubscriptionId'), parameters('persistentResourceGroup'), 'Microsoft.Compute/disks', parameters('diskResourceName'))]",
+    "identityId": "[resourceId(parameters('persistentSubscriptionId'), parameters('persistentResourceGroup'), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
+
   },
   "resources": [
     {
@@ -180,6 +188,12 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
       ],
+      "identity": {
+        "type": "userAssigned",
+        "userAssignedIdentities": {
+          "[variables('identityId')]": {}
+        }
+      },
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -252,8 +266,7 @@
               "commandToExecute": "git clone https://github.com/sihde/mcazure.git /root/mcazure && cd /root/mcazure/setup && ./setup.sh >setup.log 2>setup.err"
             }
           }
-        }
-      ]
+        }      ]
     }
   ]
 }

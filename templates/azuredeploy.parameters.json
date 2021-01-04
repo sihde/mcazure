@@ -14,11 +14,14 @@
         "vmSize": {
             "value": "Standard_F4s_v2"
         },
-        "diskResourceGroup": {
+        "persistentResourceGroup": {
             "value": "mc-storage"
         },
         "diskResourceName": {
             "value": "minecraft-datadisk1"
+        },
+        "managedIdentityName": {
+            "value": "hamachi-mc-id"
         }
     }
 }

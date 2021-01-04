@@ -1,0 +1,70 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "projectName": {
+            "type": "string",
+            "defaultValue": "hamachi-mc",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "variables": {
+        "tenantId": "[subscription().tenantId]",
+        "idName": "[concat(parameters('projectName'), '-id')]",
+        "diskName": "minecraft-datadisk1",
+        "vaultName": "[concat(parameters('projectName'), '-vault')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "name": "[variables('idName')]",
+            "apiVersion": "2018-11-30",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "apiVersion": "2020-06-30",
+            "name": "[variables('diskName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "StandardSSD_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": 16
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2019-09-01",
+            "name": "[variables('vaultName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('idName'))]"
+            ],
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "tenantId": "[variables('tenantId')]",
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "accessPolicies": [
+                    {
+                        "tenantId": "[variables('tenantId')]",
+                        "objectId": "[reference(variables('idName')).principalId]",
+                        "permissions": {
+                            "keys": [ "get", "list" ],
+                            "secrets": [ "get", "list" ],
+                            "certificates": [ "get", "list" ]
+                        }
+                    }
+
+                ]
+            }
+        }
+    ]
+}  
