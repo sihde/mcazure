@@ -19,4 +19,3 @@ SuccessExitStatus=143
 
 [Install]
 Alias=minecraft@%i.service
-WantedBy=multi-user.target

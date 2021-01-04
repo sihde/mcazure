@@ -15,6 +15,7 @@ cp RPM-GPG-KEY-azulsystems /usr/local/share/keyrings/
 # Minecraft systemd configuration
 cp minecraft@.service /etc/systemd/system/
 systemctl enable minecraft@1.16.4.service
+systemctl add-wants multi-user.target minecraft@1.16.4.service
 
 apt-get update
 apt-get -y upgrade --with-new-pkgs
@@ -29,5 +30,3 @@ mkdir -p /srv
 cat >> /etc/fstab <<EOF
 UUID=e0698c68-30d0-482a-9615-a6278be757b4 /srv ext4 defaults 0 2
 EOF
-
-mount /srv
