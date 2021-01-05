@@ -22,9 +22,13 @@ cp minecraft@.service /etc/systemd/system/
 systemctl enable minecraft@1.16.4.service
 systemctl add-wants multi-user.target minecraft@1.16.4.service
 
+# Preseed debconf
+echo sysstat sysstat/enable boolean true | debconf-set-selections
+
+# Install and upgrade packages
 apt-get update
 apt-get -y upgrade --with-new-pkgs
-apt-get -y install zulu8-jre-headless azure-cli
+apt-get -y install zulu8-jre-headless azure-cli sysstat
 apt-get -y autoremove --purge
 
 # Create user
