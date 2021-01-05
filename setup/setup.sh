@@ -36,7 +36,15 @@ cat >> /etc/fstab <<EOF
 UUID=e0698c68-30d0-482a-9615-a6278be757b4 /srv ext4 defaults 0 2
 EOF
 
-# Log in with user-assigned managed identity
-az login --allow-no-subscriptions --identity -u '/subscriptions/32c8a58f-efa7-4fee-8245-180c4c11257b/resourceGroups/mc-storage/providers/Microsoft.ManagedIdentity/userAssignedIdentities/hamachi-mc-id'
+# Log in with user-assigned managed identity that has KeyVault access
+az login --allow-no-subscriptions --identity \
+  -u '/subscriptions/32c8a58f-efa7-4fee-8245-180c4c11257b/resourceGroups/mc-storage/providers/Microsoft.ManagedIdentity/userAssignedIdentities/hamachi-mc-id'
 
-# TODO: download ssh host keys
+# download ssh host keys from KeyVault and configure ssh server to use them
+az keyvault secret download --vault-name hamachi-mc-vault --name host-key-ed25519 \
+  --file hamachi-mc_ed25519_key
+chmod 0600 hamachi-mc_ed25519_key
+mv hamachi-mc_ed25519_key /etc/ssh/
+ssh-keygen -y -f /etc/ssh/hamachi-mc_ed25519_key > /etc/ssh/hamachi-mc_ed25519_key.pub
+patch /etc/ssh/sshd_config sshd_config.diff 
+dpkg-reconfigure -f noninteractive openssh-server
