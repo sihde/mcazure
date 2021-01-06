@@ -266,7 +266,30 @@
               "commandToExecute": "git clone https://github.com/sihde/mcazure.git /root/mcazure && cd /root/mcazure/setup && ./setup.sh >setup.log 2>setup.err"
             }
           }
-        }      ]
+        },
+        {
+            "type": "Microsoft.DevTestLab/schedules",
+            "apiVersion": "2016-05-15",
+            "name": "[concat('shutdown-computevm-', variables('vmName'))]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
+            ],
+            "properties": {
+                "status": "Enabled",
+                "taskType": "ComputeVmShutdownTask",
+                "dailyRecurrence": {
+                    "time": "2000"
+                },
+                "timeZoneId": "Pacific Standard Time",
+                "notificationSettings": {
+                    "status": "Disabled",
+                    "timeInMinutes": 30
+                },
+                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
+            }
+        }
+      ]
     }
   ]
 }
