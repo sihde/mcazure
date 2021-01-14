@@ -45,10 +45,12 @@ az login --allow-no-subscriptions --identity \
   -u '/subscriptions/32c8a58f-efa7-4fee-8245-180c4c11257b/resourceGroups/mc-storage/providers/Microsoft.ManagedIdentity/userAssignedIdentities/hamachi-mc-id'
 
 # download ssh host keys from KeyVault and configure ssh server to use them
+restore_umask=$(umask -p)
+umask 0077
 az keyvault secret download --vault-name hamachi-mc-vault --name host-key-ed25519 \
   --file hamachi-mc_ed25519_key
-chmod 0600 hamachi-mc_ed25519_key
 mv hamachi-mc_ed25519_key /etc/ssh/
+$restore_umask
 ssh-keygen -y -f /etc/ssh/hamachi-mc_ed25519_key > /etc/ssh/hamachi-mc_ed25519_key.pub
 
 # Patch adds HostKey directive for the new key
