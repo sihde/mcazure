@@ -45,19 +45,22 @@ EOF
 az login --identity \
   -u '/subscriptions/32c8a58f-efa7-4fee-8245-180c4c11257b/resourceGroups/mc-storage/providers/Microsoft.ManagedIdentity/userAssignedIdentities/hamachi-mc-id'
 
-# Get storage account key
-# az storage account keys list -g mc-storage -n hamachifiles --query "[0].value"|perl -pe 's#"([a-zA-Z0-9/+=]+)"#password=$1#' > creds.txt
-# Mount SMB share in fstab
-# //myaccountname.file.core.windows.net/mystorageshare /mnt/mymountpoint cifs vers=3.0,username=mystorageaccount,cred=/path/to/cred,dir_mode=0777,file_mode=0777
-
 # download ssh host keys from KeyVault and configure ssh server to use them
 restore_umask=$(umask -p)
 umask 0077
 az keyvault secret download --vault-name hamachi-mc-vault --name host-key-ed25519 \
   --file hamachi-mc_ed25519_key
 mv hamachi-mc_ed25519_key /etc/ssh/
+# Get storage account key
+az storage account keys list -g mc-storage -n hamachifiles --query "[0].value"|perl -pe 's#"([a-zA-Z0-9/+=]+)"#password=$1#' > /etc/smbcred.txt
 $restore_umask
 ssh-keygen -y -f /etc/ssh/hamachi-mc_ed25519_key > /etc/ssh/hamachi-mc_ed25519_key.pub
+
+# Mount SMB share in fstab
+mkdir -p /tmp/smb
+cat >> /etc/fstab <<EOF
+//hamachifiles.file.core.windows.net/mystorageshare /tmp/smb cifs vers=3.0,username=hamachifiles,cred=/etc/smbcred.txt,dir_mode=0777,file_mode=0777 0 2
+EOF
 
 # Patch adds HostKey directive for the new key
 patch /etc/ssh/sshd_config sshd_config.diff 
