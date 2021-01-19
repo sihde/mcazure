@@ -59,7 +59,7 @@ ssh-keygen -y -f /etc/ssh/hamachi-mc_ed25519_key > /etc/ssh/hamachi-mc_ed25519_k
 # Mount SMB share in fstab
 mkdir -p /tmp/smb
 cat >> /etc/fstab <<EOF
-//hamachifiles.file.core.windows.net/mystorageshare /tmp/smb cifs vers=3.0,username=hamachifiles,cred=/etc/smbcred.txt,dir_mode=0777,file_mode=0777 0 2
+//hamachifiles.file.core.windows.net/hamachi-mc-share /tmp/smb cifs vers=3.0,username=hamachifiles,cred=/etc/smbcred.txt,dir_mode=0777,file_mode=0777 0 2
 EOF
 
 # Patch adds HostKey directive for the new key
