@@ -211,7 +211,10 @@
                 }
               ]
             }
-          }
+          },
+          "secrets": [
+            
+          ]
         },
         "storageProfile": {
           "imageReference": {

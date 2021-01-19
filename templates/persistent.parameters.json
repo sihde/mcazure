@@ -4,6 +4,12 @@
     "parameters": {
         "adminId": {
             "value": "ba9c1b05-e766-4ffa-8338-474c5868b6f4"
+        },
+        "idReaderRoleGuid": {
+            "value": "0f023d12-11a1-4ada-b3f9-8a8cd1839de5"
+        },
+        "storageReaderRoleGuid": {
+            "value": "1d237018-100c-47f5-8fed-5febe8329ef2"
         }
     }
 }

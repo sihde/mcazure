@@ -12,36 +12,66 @@
         "adminId": {
             "type": "string",
             "metadata": {
-                "description": "UUID of vault owner principal"
+                "description": "GUID of vault owner principal"
+            }
+        },
+        "idReaderRoleGuid": {
+            "type": "string",
+            "defaultValue": "[newGuid()]",
+            "metadata": {
+                "description": "GUID of role assignment; must stay the same or template is not idempotent"
+            }
+        },
+        "storageReaderRoleGuid": {
+            "type": "string",
+            "defaultValue": "[newGuid()]",
+            "metadata": {
+                "description": "GUID of role assignment; must stay the same or template is not idempotent"
             }
         }
     },
     "variables": {
+        "location": "[resourceGroup().location]",
         "tenantId": "[subscription().tenantId]",
         "idName": "[concat(parameters('projectName'), '-id')]",
         "diskName": "minecraft-datadisk1",
-        "vaultName": "[concat(parameters('projectName'), '-vault')]"
+        "vaultName": "[concat(parameters('projectName'), '-vault')]",
+        "storageAccountName": "hamachifiles",
+        "fileShareName": "[concat(parameters('projectName'), '-share')]"
     },
     "resources": [
         {
             "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
             "name": "[variables('idName')]",
             "apiVersion": "2018-11-30",
-            "location": "[resourceGroup().location]"
+            "location": "[variables('location')]"
         },
         {
-            "type": "Microsoft.Compute/disks",
-            "apiVersion": "2020-06-30",
-            "name": "[variables('diskName')]",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "StandardSSD_LRS"
-            },
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-04-01-preview",
+            "name": "[parameters('idReaderRoleGuid')]",
+            "scope": "[concat('Microsoft.ManagedIdentity/userAssignedIdentities', '/', variables('idName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('idName'))]"
+            ],
             "properties": {
-                "creationData": {
-                    "createOption": "Empty"
-                },
-                "diskSizeGB": 16
+                "description": "Give 'idName' Reader access to itself to allow az login to work on VM",
+                "roleDefinitionId": "/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7",
+                "principalId": "[reference(variables('idName')).principalId]"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-04-01-preview",
+            "name": "[parameters('storageReaderRoleGuid')]",
+            "scope": "[concat('Microsoft.Storage/storageAccounts', '/', variables('storageAccountName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "description": "Give 'idName' Reader and Data Access to storage account",
+                "roleDefinitionId": "/providers/Microsoft.Authorization/roleDefinitions/c12c1c16-33a1-487b-954d-41c89c60f349",
+                "principalId": "[reference(variables('idName')).principalId]"
             }
         },
         {
@@ -51,7 +81,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('idName'))]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[variables('location')]",
             "properties": {
                 "tenantId": "[variables('tenantId')]",
                 "sku": {
@@ -63,21 +93,64 @@
                         "tenantId": "[variables('tenantId')]",
                         "objectId": "[parameters('adminId')]",
                         "permissions": {
-                            "keys": [ "all" ],
-                            "secrets": [ "all" ],
-                            "certificates": [ "all" ]
+                            "keys": [ "All" ],
+                            "secrets": [ "All" ],
+                            "certificates": [ "All" ]
                         }
                     },
                     {
                         "tenantId": "[variables('tenantId')]",
                         "objectId": "[reference(variables('idName')).principalId]",
                         "permissions": {
-                            "keys": [ "get", "list" ],
-                            "secrets": [ "get", "list" ],
-                            "certificates": [ "get", "list" ]
+                            "keys": [ "Get", "List" ],
+                            "secrets": [ "Get", "List" ],
+                            "certificates": [ "Get", "List" ]
                         }
                     }
                 ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "apiVersion": "2020-06-30",
+            "name": "[variables('diskName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "StandardSSD_LRS"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": 16
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "westus2", // ZRS not supported in West US
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_ZRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "allowBlobPublicAccess": false,
+                "supportsHttpsTrafficOnly": true,
+                "minimumTlsVersion": "TLS1_2"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageAccountName'), '/default/', variables('fileShareName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "accessTier": "TransactionOptimized",
+                "enabledProtocols": "SMB"
             }
         }
     ]
