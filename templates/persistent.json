@@ -66,6 +66,7 @@
             "name": "[parameters('storageReaderRoleGuid')]",
             "scope": "[concat('Microsoft.Storage/storageAccounts', '/', variables('storageAccountName'))]",
             "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('idName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ],
             "properties": {
