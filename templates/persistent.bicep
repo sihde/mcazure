@@ -18,7 +18,7 @@ var vaultName = '${projectName}-vault'
 var storageAccountName = 'hamachifiles'
 var fileShareName = '${projectName}-share'
 
-var rolePrefix = '/providers/Microsoft.Authorization/roleDefinitions/'
+var rolePrefix = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/'
 var roleReader = 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
 var roleReaderAndDataAccess = 'c12c1c16-33a1-487b-954d-41c89c60f349'
 var roleKeyVaultSecretsUser = '4633458b-17de-408a-b874-0445c86b69e6'
