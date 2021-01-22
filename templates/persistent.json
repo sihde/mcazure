@@ -29,13 +29,6 @@
                 "description": "GUID of role assignment; must stay the same or template is not idempotent"
             }
         },
-        "keyVaultOwnerRoleGuid": {
-            "type": "string",
-            "defaultValue": "[newGuid()]",
-            "metadata": {
-                "description": "GUID of role assignment; must stay the same or template is not idempotent"
-            }
-        },
         "keyVaultAdminRoleGuid": {
             "type": "string",
             "defaultValue": "[newGuid()]",
@@ -127,20 +120,6 @@
                 "description": "Give 'idName' Key Vault access 'Key Vault Secrets User (preview)'",
                 "roleDefinitionId": "/providers/Microsoft.Authorization/roleDefinitions/4633458b-17de-408a-b874-0445c86b69e6",
                 "principalId": "[reference(variables('idName')).principalId]"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2020-04-01-preview",
-            "name": "[parameters('keyVaultOwnerRoleGuid')]",
-            "scope": "[concat('Microsoft.KeyVault/vaults', '/', variables('vaultName'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', variables('vaultName'))]"
-            ],
-            "properties": {
-                "description": "Give admin 'Owner' Key Vault access",
-                "roleDefinitionId": "/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
-                "principalId": "[parameters('adminId')]"
             }
         },
         {

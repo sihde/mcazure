@@ -11,9 +11,6 @@
         "storageReaderRoleGuid": {
             "value": "1d237018-100c-47f5-8fed-5febe8329ef2"
         },
-        "keyVaultOwnerRoleGuid": {
-            "value": "6ec2cedc-9d5a-4da7-b3a0-1563b2690fd0"
-        },
         "keyVaultUserRoleGuid": {
             "value": "3dba1fd7-0526-4e57-9ed0-de99091ba2da"
         },
