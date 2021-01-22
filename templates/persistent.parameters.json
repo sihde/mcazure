@@ -4,18 +4,6 @@
     "parameters": {
         "adminId": {
             "value": "ba9c1b05-e766-4ffa-8338-474c5868b6f4"
-        },
-        "idReaderRoleGuid": {
-            "value": "1b5ef0fe-0474-4c75-ba0f-3aff44d6dbae"
-        },
-        "storageReaderRoleGuid": {
-            "value": "1d237018-100c-47f5-8fed-5febe8329ef2"
-        },
-        "keyVaultUserRoleGuid": {
-            "value": "3dba1fd7-0526-4e57-9ed0-de99091ba2da"
-        },
-        "keyVaultAdminRoleGuid": {
-            "value": "11003c0a-1972-485d-a1df-88a0588ac5f1"
         }
     }
 }
