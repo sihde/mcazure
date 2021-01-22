@@ -33,17 +33,17 @@ apt-get -y autoremove --purge
 
 # Create user
 adduser --disabled-login --quiet --home /srv/minecraft --no-create-home minecraft --gecos ""
-mkdir -p /srv
+mkdir -p /srv/srv-old
 
 # Add mount point for home directory
 cat >> /etc/fstab <<EOF
-UUID=e0698c68-30d0-482a-9615-a6278be757b4 /srv ext4 defaults 0 2
+UUID=e0698c68-30d0-482a-9615-a6278be757b4 /srv/srv-old ext4 defaults 0 2
 EOF
 
 
 # Log in with user-assigned managed identity that has KeyVault access
 az login --identity \
-  -u '/subscriptions/32c8a58f-efa7-4fee-8245-180c4c11257b/resourceGroups/mc-storage/providers/Microsoft.ManagedIdentity/userAssignedIdentities/hamachi-mc-id'
+  -u '/subscriptions/32c8a58f-efa7-4fee-8245-180c4c11257b/resourceGroups/mc-storage2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/hamachi-mc-id'
 
 # download ssh host keys from KeyVault and configure ssh server to use them
 restore_umask=$(umask -p)
@@ -57,9 +57,9 @@ $restore_umask
 ssh-keygen -y -f /etc/ssh/hamachi-mc_ed25519_key > /etc/ssh/hamachi-mc_ed25519_key.pub
 
 # Mount SMB share in fstab
-mkdir -p /tmp/smb
+mkdir -p /srv/minecraft
 cat >> /etc/fstab <<EOF
-//hamachifiles.file.core.windows.net/hamachi-mc-share /tmp/smb cifs vers=3.0,seal,username=hamachifiles,cred=/etc/smbcred.txt,mfsymlinks,dir_mode=0770,file_mode=0660,uid=minecraft,gid=minecraft 0 2
+//hamachifiles.file.core.windows.net/hamachi-mc-share /srv/minecraft cifs vers=3.0,seal,username=hamachifiles,cred=/etc/smbcred.txt,mfsymlinks,dir_mode=0777,file_mode=0777,uid=minecraft,gid=minecraft 0 2
 EOF
 
 # Patch adds HostKey directive for the new key
