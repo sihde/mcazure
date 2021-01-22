@@ -109,12 +109,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' = {
 }
 
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2019-06-01' = {
-  name: '${storageAccountName}/default/${fileShareName}'
+  name: '${storageAccount.name}/default/${fileShareName}'
   properties: {
     accessTier: 'TransactionOptimized'
     enabledProtocols: 'SMB'
   }
-  dependsOn: [
-    storageAccount
-  ]
 }
