@@ -52,7 +52,7 @@ az keyvault secret download --vault-name hamachi-mc-vault --name host-key-ed2551
   --file hamachi-mc_ed25519_key
 mv hamachi-mc_ed25519_key /etc/ssh/
 # Get storage account key
-az storage account keys list -g mc-storage -n hamachifiles --query "[0].value"|perl -pe 's#"([a-zA-Z0-9/+=]+)"#password=$1#' > /etc/smbcred.txt
+az storage account keys list -g mc-storage2 -n hamachifiles --query "[0].value"|perl -pe 's#"([a-zA-Z0-9/+=]+)"#password=$1#' > /etc/smbcred.txt
 $restore_umask
 ssh-keygen -y -f /etc/ssh/hamachi-mc_ed25519_key > /etc/ssh/hamachi-mc_ed25519_key.pub
 
