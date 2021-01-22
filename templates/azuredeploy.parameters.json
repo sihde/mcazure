@@ -15,7 +15,7 @@
             "value": "Standard_B2S"
         },
         "persistentResourceGroup": {
-            "value": "mc-storage"
+            "value": "mc-storage2"
         },
         "diskResourceName": {
             "value": "minecraft-datadisk1"
