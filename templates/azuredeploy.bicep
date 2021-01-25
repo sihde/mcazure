@@ -47,19 +47,14 @@ param managedIdentityName string {
   }
 }
 
-var vNetName = '${projectName}-vnet'
 var vNetAddressPrefixes = '10.0.0.0/16'
-var vNetSubnetName = 'default'
 var vNetSubnetAddressPrefix = '10.0.0.0/24'
 var vmName = '${projectName}-vm'
-var publicIPAddressName = '${projectName}-ip'
-var networkInterfaceName = '${projectName}-nic'
-var vNetNSGName = '${vNetSubnetName}-nsg'
 var diskId = resourceId(persistentSubscriptionId, persistentResourceGroup, 'Microsoft.Compute/disks', diskResourceName)
 var identityId = resourceId(persistentSubscriptionId, persistentResourceGroup, 'Microsoft.ManagedIdentity/userAssignedIdentities', managedIdentityName)
 
 resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2020-05-01' = {
-  name: publicIPAddressName
+  name: '${projectName}-ip'
   location: location
   properties: {
     publicIPAllocationMethod: 'Dynamic'
@@ -73,7 +68,7 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2020-05-01' = {
 }
 
 resource vNetNSG 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
-  name: vNetNSGName
+  name: 'default-nsg'
   location: location
   properties: {
     securityRules: [
@@ -109,7 +104,7 @@ resource vNetNSG 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
 }
 
 resource vNet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
-  name: vNetName
+  name: '${projectName}-vnet'
   location: location
   properties: {
     addressSpace: {
@@ -117,22 +112,21 @@ resource vNet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
         vNetAddressPrefixes
       ]
     }
-    subnets: [
-      {
-        name: vNetSubnetName
-        properties: {
-          addressPrefix: vNetSubnetAddressPrefix
-          networkSecurityGroup: {
-            id: vNetNSG.id
-          }
-        }
-      }
-    ]
+  }
+}
+
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2020-05-01' = {
+  name: '${vNet.name}/default'
+  properties: {
+    addressPrefix: vNetSubnetAddressPrefix
+    networkSecurityGroup: {
+      id: vNetNSG.id
+    }
   }
 }
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = {
-  name: networkInterfaceName
+  name: '${projectName}-nic'
   location: location
   properties: {
     ipConfigurations: [
@@ -144,15 +138,12 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = {
             id: publicIPAddress.id
           }
           subnet: {
-            id: resourceId('Microsoft.Network/virtualNetworks/subnets', vNetName, vNetSubnetName)
+            id: subnet.id
           }
         }
       }
     ]
   }
-  dependsOn: [
-    vNet
-  ]
 }
 
 resource vm 'Microsoft.Compute/virtualMachines@2020-12-01' = {
