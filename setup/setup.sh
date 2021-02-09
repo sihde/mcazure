@@ -59,7 +59,7 @@ ssh-keygen -y -f /etc/ssh/hamachi-mc_ed25519_key > /etc/ssh/hamachi-mc_ed25519_k
 # Mount SMB share in fstab
 mkdir -p /srv/minecraft
 cat >> /etc/fstab <<EOF
-//hamachifiles.file.core.windows.net/hamachi-mc-share /srv/minecraft cifs vers=3.0,seal,username=hamachifiles,cred=/etc/smbcred.txt,mfsymlinks,dir_mode=0777,file_mode=0777,uid=minecraft,gid=minecraft 0 2
+//hamachifiles.file.core.windows.net/hamachi-mc-share /srv/minecraft cifs vers=3.0,seal,username=hamachifiles,cred=/etc/smbcred.txt,mfsymlinks,dir_mode=0777,file_mode=0777,noperm,uid=minecraft,gid=minecraft 0 2
 EOF
 
 # Patch adds HostKey directive for the new key
