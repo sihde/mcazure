@@ -99,6 +99,20 @@ resource vNetNSG 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
           direction: 'Inbound'
         }
       }
+      {
+        name: 'ServerSync'
+        properties: {
+          description: 'ServerSync'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '38067'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 201
+          direction: 'Inbound'
+        }
+      }
     ]
   }
 }
