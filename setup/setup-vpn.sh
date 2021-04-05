@@ -48,3 +48,4 @@ systemctl enable wg-quick@wg0.service
 
 cp nftables.conf /etc/nftables.conf
 
+echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/50-ipforward.conf
