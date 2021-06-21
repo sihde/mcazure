@@ -1,51 +1,28 @@
-param projectName string {
-  metadata: {
-    description: 'Specifies a name for generating resource names.'
-  }
-}
-param location string {
-  metadata: {
-    description: 'Specifies the location for all resources.'
-  }
-  default: resourceGroup().location
-}
-param adminUsername string {
-  metadata: {
-    description: 'Specifies a username for the Virtual Machine.'
-  }
-}
-param adminPublicKey string {
-  metadata: {
-    description: 'Specifies the SSH rsa public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.'
-  }
-}
-param vmSize string {
-  metadata: {
-    description: 'description'
-  }
-  default: 'Standard_D2s_v3'
-}
-param persistentSubscriptionId string {
-  metadata: {
-    description: 'Sub ID for persistent stuff'
-  }
-  default: subscription().subscriptionId
-}
-param persistentResourceGroup string {
-  metadata: {
-    description: 'Resource Group for persistent stuff'
-  }
-}
-param diskResourceName string {
-  metadata: {
-    description: 'Resource Name for persistent storage disk'
-  }
-}
-param managedIdentityName string {
-  metadata: {
-    description: 'Resource Name for mananged identity'
-  }
-}
+@description('Specifies a name for generating resource names.')
+param projectName string
+
+@description('Specifies the location for all resources.')
+param location string = resourceGroup().location
+
+@description('Specifies a username for the Virtual Machine.')
+param adminUsername string
+
+@description('Specifies the SSH rsa public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
+param adminPublicKey string
+
+param vmSize string = 'Standard_D2s_v3'
+
+@description('Sub ID for persistent stuff')
+param persistentSubscriptionId string = subscription().subscriptionId
+
+@description('Resource Group for persistent stuff')
+param persistentResourceGroup string
+
+@description('Resource Name for persistent storage disk')
+param diskResourceName string
+
+@description('Resource Name for mananged identity')
+param managedIdentityName string
 
 var vNetAddressPrefixes = '10.0.0.0/16'
 var vNetSubnetAddressPrefix = '10.0.0.0/24'
