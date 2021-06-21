@@ -155,7 +155,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2020-12-01' = {
   name: vmName
   location: location
   identity: {
-    type: 'userAssigned'
+    type: 'UserAssigned'
     userAssignedIdentities: {
       '${identityId}': {}
     }
@@ -188,13 +188,13 @@ resource vm 'Microsoft.Compute/virtualMachines@2020-12-01' = {
         version: 'latest'
       }
       osDisk: {
-        createOption: 'fromImage'
+        createOption: 'FromImage'
       }
       dataDisks: [
         {
           lun: 0
           name: diskResourceName
-          createOption: 'attach'
+          createOption: 'Attach'
           managedDisk: {
             id: diskId
           }
