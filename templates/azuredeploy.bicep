@@ -77,6 +77,20 @@ resource vNetNSG 'Microsoft.Network/networkSecurityGroups@2020-05-01' = {
         }
       }
       {
+        name: 'minecraft-bedrock'
+        properties: {
+          description: 'Minecraft Bedrock port for Geyser'
+          protocol: 'Udp'
+          sourcePortRange: '*'
+          destinationPortRange: '19132'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 202
+          direction: 'Inbound'
+        }
+      }
+      {
         name: 'ServerSync'
         properties: {
           description: 'ServerSync'
