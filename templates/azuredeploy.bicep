@@ -26,6 +26,7 @@ param managedIdentityName string
 
 var vNetAddressPrefixes = '10.0.0.0/16'
 var vNetSubnetAddressPrefix = '10.0.0.0/24'
+var vNetSubnetName = 'default'
 var vmName = '${projectName}-vm'
 var diskId = resourceId(persistentSubscriptionId, persistentResourceGroup, 'Microsoft.Compute/disks', diskResourceName)
 var identityId = resourceId(persistentSubscriptionId, persistentResourceGroup, 'Microsoft.ManagedIdentity/userAssignedIdentities', managedIdentityName)
@@ -117,16 +118,17 @@ resource vNet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
         vNetAddressPrefixes
       ]
     }
-  }
-}
-
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2020-05-01' = {
-  name: '${vNet.name}/default'
-  properties: {
-    addressPrefix: vNetSubnetAddressPrefix
-    networkSecurityGroup: {
-      id: vNetNSG.id
-    }
+    subnets: [
+      {
+        name: vNetSubnetName
+        properties: {
+          addressPrefix: vNetSubnetAddressPrefix
+          networkSecurityGroup: {
+            id: vNetNSG.id
+          }
+        }
+      }
+    ]
   }
 }
 
@@ -143,7 +145,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = {
             id: publicIPAddress.id
           }
           subnet: {
-            id: subnet.id
+            id: '${vNet.id}/subnets/${vNetSubnetName}'
           }
         }
       }
