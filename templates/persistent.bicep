@@ -1,14 +1,7 @@
-param projectName string {
-  metadata: {
-    description: 'description'
-  }
-  default: 'hamachi-mc'
-}
-param adminId string {
-  metadata: {
-    description: 'GUID of vault owner principal'
-  }
-}
+param projectName string = 'hamachi-mc'
+
+@description('GUID of vault owner principal')
+param adminId string
 
 var location = 'westus2'
 var tenantId = subscription().tenantId
