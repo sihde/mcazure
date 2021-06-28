@@ -24,6 +24,9 @@ param diskResourceName string
 @description('Resource Name for mananged identity')
 param managedIdentityName string
 
+@description('Charlie principal ID')
+param charlieId string = '8bba46ab-d480-452a-8037-556af093d2db'
+
 var vNetAddressPrefixes = '10.0.0.0/16'
 var vNetSubnetAddressPrefix = '10.0.0.0/24'
 var vNetSubnetName = 'default'
@@ -249,4 +252,28 @@ resource shutdownSchedule 'Microsoft.DevTestLab/schedules@2016-05-15' = {
     }
     targetResourceId: vm.id
   }
+}
+
+/* RBAC Assignments for Charlie */
+var rolePrefix = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/'
+var roleReader = '${rolePrefix}acdd72a7-3385-48ef-bd42-f606fba81ae7'
+var roleVmContributor = '${rolePrefix}9980e02c-c2be-4d73-94e8-173b1dc7cf3c'
+
+resource subscriptionReaderRole 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(subscription().id, charlieId, resourceGroup().id, roleReader)
+  properties: {
+    description: 'Reader access on subscription'
+    roleDefinitionId: roleReader
+    principalId: charlieId
+  }
+  scope: resourceGroup()
+}
+
+resource vmContributorRole 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(subscription().id, charlieId, vm.id, roleVmContributor)
+  properties: {
+    roleDefinitionId: roleVmContributor
+    principalId: charlieId
+  }
+  scope: vm
 }
