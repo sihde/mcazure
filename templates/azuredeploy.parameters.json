@@ -22,6 +22,9 @@
         },
         "managedIdentityName": {
             "value": "hamachi-mc-id"
+        },
+        "operatorId": {
+            "value": "8bba46ab-d480-452a-8037-556af093d2db"
         }
     }
 }

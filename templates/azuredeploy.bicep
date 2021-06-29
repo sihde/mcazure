@@ -24,8 +24,8 @@ param diskResourceName string
 @description('Resource Name for mananged identity')
 param managedIdentityName string
 
-@description('Charlie principal ID')
-param charlieId string = '8bba46ab-d480-452a-8037-556af093d2db'
+@description('Operator principal ID')
+param operatorId string
 
 var vNetAddressPrefixes = '10.0.0.0/16'
 var vNetSubnetAddressPrefix = '10.0.0.0/24'
@@ -254,26 +254,26 @@ resource shutdownSchedule 'Microsoft.DevTestLab/schedules@2016-05-15' = {
   }
 }
 
-/* RBAC Assignments for Charlie */
+/* RBAC Assignments for Start/Stop VM */
 var rolePrefix = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/'
 var roleReader = '${rolePrefix}acdd72a7-3385-48ef-bd42-f606fba81ae7'
 var roleVmContributor = '${rolePrefix}9980e02c-c2be-4d73-94e8-173b1dc7cf3c'
 
 resource subscriptionReaderRole 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(subscription().id, charlieId, resourceGroup().id, roleReader)
+  name: guid(subscription().id, operatorId, resourceGroup().id, roleReader)
   properties: {
     description: 'Reader access on subscription'
     roleDefinitionId: roleReader
-    principalId: charlieId
+    principalId: operatorId
   }
   scope: resourceGroup()
 }
 
 resource vmContributorRole 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(subscription().id, charlieId, vm.id, roleVmContributor)
+  name: guid(subscription().id, operatorId, vm.id, roleVmContributor)
   properties: {
     roleDefinitionId: roleVmContributor
-    principalId: charlieId
+    principalId: operatorId
   }
   scope: vm
 }
