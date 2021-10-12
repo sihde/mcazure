@@ -35,7 +35,9 @@ apt-get -y autoremove --purge
 
 # Create user
 adduser --disabled-login --quiet --home /srv/minecraft --no-create-home minecraft --gecos ""
-mkdir -p /srv/srv-old
+
+# Comment out for same reason as below
+#mkdir -p /srv/srv-old
 
 # Add mount point for home directory
 # Comment out while switching to scale sets
