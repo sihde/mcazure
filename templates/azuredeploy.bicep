@@ -243,7 +243,7 @@ resource shutdownSchedule 'Microsoft.DevTestLab/schedules@2016-05-15' = {
     status: 'Enabled'
     taskType: 'ComputeVmShutdownTask'
     dailyRecurrence: {
-      time: '2000'
+      time: '2100'
     }
     timeZoneId: 'Pacific Standard Time'
     notificationSettings: {
