@@ -19,8 +19,10 @@ cp microsoft.gpg /usr/local/share/keyrings/
 
 # Minecraft systemd configuration
 cp minecraft@.service /etc/systemd/system/
-systemctl enable minecraft@1.16.4.service
-systemctl add-wants multi-user.target minecraft@1.16.4.service
+# Don't enable by default, since multiple hosts in the scale set
+# would fight over the same instance
+#systemctl enable minecraft@1.16.4.service
+#systemctl add-wants multi-user.target minecraft@1.16.4.service
 
 # Preseed debconf
 echo sysstat sysstat/enable boolean true | debconf-set-selections
