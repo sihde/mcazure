@@ -28,7 +28,7 @@ echo sysstat sysstat/enable boolean true | debconf-set-selections
 # Install and upgrade packages
 apt-get update
 apt-get -y upgrade --with-new-pkgs
-apt-get -y install zulu8-jre-headless azure-cli sysstat cifs-utils
+apt-get -y install zulu8-jre-headless zulu17-jre-headless azure-cli sysstat cifs-utils
 apt-get -y autoremove --purge
 
 # Create user
@@ -36,9 +36,10 @@ adduser --disabled-login --quiet --home /srv/minecraft --no-create-home minecraf
 mkdir -p /srv/srv-old
 
 # Add mount point for home directory
-cat >> /etc/fstab <<EOF
-UUID=e0698c68-30d0-482a-9615-a6278be757b4 /srv/srv-old ext4 defaults 0 2
-EOF
+# Comment out while switching to scale sets
+#cat >> /etc/fstab <<EOF
+#UUID=e0698c68-30d0-482a-9615-a6278be757b4 /srv/srv-old ext4 defaults 0 2
+#EOF
 
 
 # Log in with user-assigned managed identity that has KeyVault access
