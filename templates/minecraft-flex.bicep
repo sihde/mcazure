@@ -277,6 +277,76 @@ resource vmssflex 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = {
   }
 }
 
+resource vm_minecraft 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+  //parent: vmssflex
+  name: '${vmssName}_022f979b'
+  location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${identityId}': {}
+    }
+  }
+  properties: {
+    virtualMachineScaleSet: {
+      id: vmssflex.id
+    }
+  }
+}
+
+resource vm_kittenz 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+  //parent: vmssflex
+  name: '${vmssName}_fb87e52f'
+  location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${identityId}': {}
+    }
+  }
+  properties: {
+    virtualMachineScaleSet: {
+      id: vmssflex.id
+    }
+  }
+}
+
+resource shutdownMC 'Microsoft.DevTestLab/schedules@2016-05-15' = {
+  name: 'shutdown-computevm-${vm_minecraft.name}'
+  location: location
+  properties: {
+    status: 'Enabled'
+    taskType: 'ComputeVmShutdownTask'
+    dailyRecurrence: {
+      time: '2100'
+    }
+    timeZoneId: 'Pacific Standard Time'
+    notificationSettings: {
+      status: 'Disabled'
+      timeInMinutes: 30
+    }
+    targetResourceId: vm_minecraft.id
+  }
+}
+resource shutdownSchedule 'Microsoft.DevTestLab/schedules@2016-05-15' = {
+  name: 'shutdown-computevm-${vm_kittenz.name}'
+  location: location
+  properties: {
+    status: 'Enabled'
+    taskType: 'ComputeVmShutdownTask'
+    dailyRecurrence: {
+      time: '2100'
+    }
+    timeZoneId: 'Pacific Standard Time'
+    notificationSettings: {
+      status: 'Disabled'
+      timeInMinutes: 30
+    }
+    targetResourceId: vm_kittenz.id
+  }
+}
+
+
 /* RBAC Assignments for Start/Stop VM */
 var rolePrefix = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/'
 var roleReader = '${rolePrefix}acdd72a7-3385-48ef-bd42-f606fba81ae7'
@@ -293,10 +363,10 @@ resource subscriptionReaderRole 'Microsoft.Authorization/roleAssignments@2020-04
 }
 
 resource vmContributorRole 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(subscription().id, operatorId, vmssflex.id, roleVmContributor)
+  name: guid(subscription().id, operatorId, vm_minecraft.id, roleVmContributor)
   properties: {
     roleDefinitionId: roleVmContributor
     principalId: operatorId
   }
-  scope: vmssflex
+  scope: vm_minecraft
 }
