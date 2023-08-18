@@ -1,0 +1,6 @@
+using './vpn.bicep'
+param projectName = 'vpn-uk'
+param location = 'uksouth'
+param adminUsername = 'sihde'
+param adminPublicKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzBVsZ1h6PIe/t25iXmQMJNT+GTYn3Wxj8Oy+4m0W9HRZ2Wk3hDUBPpkEelrhw6oJeVtprwT3CXWqiA7fjpu5pcNi9v0plj3tH+KFVTuWjBgbR65B95R7lUQXUpUwaGPRbO/Gr2FGhQUa/Uidq2X1DFHOIlWsyv7zJ0Br4UIs+h6n93bUpAtapSmOBHo5U/Jbr8Sh8AmhlOnFGpFKPZK4J4oGbZzArfPLpYJvZZpcgt5jvbJTJGW/D+okYGIvsGwPTIeFHUgqi9Vr7vFODix2YrbpVg+91GQC1vhlEHsC3APxyn3g/1zyQlLbWR3OQKgW0mjBu7bj5f9UiDoueO5i5 sihde@sihde-mn3.linkedin.biz'
+param vmSize = 'Standard_B2S'

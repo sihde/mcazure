@@ -5,24 +5,10 @@ param adminPublicKey string
 param vmSize string = 'Standard_D2s_v3'
 
 var subnetName = 'subnet0'
-var vmName = '${projectName}-vm'
+var vmName = 'hamachi-${projectName}'
 
-resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2020-08-01' = {
-  name: '${projectName}-ip'
-  location: location
-  properties: {
-    publicIPAllocationMethod: 'Dynamic'
-    dnsSettings: {
-      domainNameLabel: 'hamachi-vpn'
-    }
-  }
-  sku: {
-    name: 'Basic'
-  }
-}
-
-resource vNetNSG 'Microsoft.Network/networkSecurityGroups@2020-08-01' = {
-  name: 'default-nsg'
+resource nsg 'Microsoft.Network/networkSecurityGroups@2020-08-01' = {
+  name: '${projectName}-nsg'
   location: location
   properties: {
     securityRules: [
@@ -71,7 +57,7 @@ resource vNet 'Microsoft.Network/virtualNetworks@2020-08-01' = {
         properties: {
           addressPrefix: '10.0.0.0/24'
           networkSecurityGroup: {
-            id: vNetNSG.id
+            id: nsg.id
           }
         }
       }
@@ -79,114 +65,19 @@ resource vNet 'Microsoft.Network/virtualNetworks@2020-08-01' = {
   }
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2020-08-01' = {
-  name: '${projectName}-nic'
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIPAddress.id
-          }
-          subnet: {
-            id: '${vNet.id}/subnets/${subnetName}'
-          }
-        }
-      }
-    ]
-  }
-}
-
-resource vm 'Microsoft.Compute/virtualMachines@2020-12-01' = {
-  name: vmName
-  location: location
-/*
-  identity: {
-    type: 'userAssigned'
-    userAssignedIdentities: {
-      '${identityId}': {}
-    }
-  }
-*/
-  properties: {
-    hardwareProfile: {
-      vmSize: vmSize
-    }
-    osProfile: {
-      computerName: vmName
-      adminUsername: adminUsername
-      linuxConfiguration: {
-        disablePasswordAuthentication: true
-        ssh: {
-          publicKeys: [
-            {
-              path: '/home/${adminUsername}/.ssh/authorized_keys'
-              keyData: adminPublicKey
-            }
-          ]
-        }
-      }
-      secrets: []
-    }
-    storageProfile: {
-      imageReference: {
-        publisher: 'Canonical'
-        offer: 'UbuntuServer'
-        sku: '18.04-LTS'
-        version: 'latest'
-      }
-      osDisk: {
-        createOption: 'FromImage'
-      }
-    }
-    networkProfile: {
-      networkInterfaces: [
-        {
-          id: networkInterface.id
-        }
-      ]
-    }
-  }
-}
-
-resource customScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2020-12-01' = {
-  name: '${vm.name}/config-app'
-  location: location
-  tags: {
-    displayName: 'config-app'
-  }
-  properties: {
-    publisher: 'Microsoft.Azure.Extensions'
-    type: 'CustomScript'
-    typeHandlerVersion: '2.1'
-    autoUpgradeMinorVersion: true
-    settings: {
-      skipDos2Unix: true
-    }
-    protectedSettings: {
-      //commandToExecute: 'git clone https://github.com/sihde/mcazure.git /root/mcazure && cd /root/mcazure/setup && ./setup.sh >setup.log 2>setup.err'
-      commandToExecute: 'git clone https://github.com/sihde/mcazure.git /root/mcazure'
-    }
-  }
-}
-
-resource shutdownSchedule 'Microsoft.DevTestLab/schedules@2016-05-15' = {
-  name: 'shutdown-computevm-${vm.name}'
-  location: location
-  properties: {
-    status: 'Enabled'
-    taskType: 'ComputeVmShutdownTask'
-    dailyRecurrence: {
-      time: '2000'
-    }
-    timeZoneId: 'Pacific Standard Time'
-    notificationSettings: {
-      status: 'Disabled'
-      timeInMinutes: 30
-    }
-    targetResourceId: vm.id
+module mcvm 'myvm.bicep' = {
+  name: 'whatever'
+  params: {
+    vmName: vmName
+    vmSize: vmSize
+    adminUsername: adminUsername
+    adminPublicKey: adminPublicKey
+    //identityId: identityId
+    location: location
+    //operatorId: operatorId
+    subnetId: '${vNet.id}/subnets/${subnetName}'
+    //commandToExecute: 'git clone https://github.com/sihde/mcazure.git /root/mcazure && cd /root/mcazure/setup && ./setup-vpn.sh >setup.log 2>setup.err'
+    //bootDiagnosticsAccount: diagStorageAccount.properties.primaryEndpoints.blob
+    cloudInitData: loadFileAsBase64('cloud-init.yaml')
   }
 }
