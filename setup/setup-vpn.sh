@@ -29,23 +29,48 @@ mkdir -p /etc/wireguard
 umask 0077
 wg genkey > /etc/wireguard/wg0.key
 
+hostname=hamachi-vpn-uk.uksouth.cloudapp.azure.com
+port=51820
+
 cat > /etc/wireguard/wg0.conf <<EOF
 # Remember IPv4 depends on nftables NAT configuration
 [Interface]
 Address = 192.168.96.1/24
 PrivateKey = $(cat /etc/wireguard/wg0.key)
-ListenPort = 51820
+ListenPort = ${port}
 # Fail if NAT rule not installed
 PreUp = nft list table ip %i | grep -qF 192.168.96.0/24
-
-# MacBook
-[Peer]
-PublicKey = ljaDpSqtvP6mlI5Bjw+3BHPsEohhHBQ4UOeKEV9XFiI=
-AllowedIPs = 192.168.96.2/32
 EOF
+
+addr=1
+for client in MacBook Pixel; do
+    wg genkey > /etc/wireguard/${client}.key
+    ((addr++))
+    address=192.168.96.${addr}
+    cat >> /etc/wireguard/wg0.conf <<EOF
+
+# ${client}
+[Peer]
+PublicKey = $(wg pubkey < /etc/wireguard/${client}.key)
+AllowedIPs = ${address}/32
+EOF
+
+    cat > /etc/wireguard/${client}.conf <<EOF
+[Interface]
+PrivateKey = $(cat /etc/wireguard/${client}.key)
+Address = ${address}/24
+DNS = 168.63.129.16
+
+[Peer]
+PublicKey = $(wg pubkey < /etc/wireguard/wg0.key)
+AllowedIPs = 0.0.0.0/0
+Endpoint = ${hostname}:${port}
+EOF
+done
 
 systemctl enable wg-quick@wg0.service
 
 cp nftables.conf /etc/nftables.conf
+systemctl enable nftables.service
 
 echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/50-ipforward.conf
