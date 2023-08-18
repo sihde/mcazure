@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "projectName": {
-            "value": "vpn"
+            "value": "vpn-eu"
         },
         "location": {
             "value": "westeurope"
