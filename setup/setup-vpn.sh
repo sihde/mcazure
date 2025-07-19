@@ -12,7 +12,7 @@ echo sysstat sysstat/enable boolean true | debconf-set-selections
 # Install and upgrade packages
 apt-get update
 apt-get -y upgrade --with-new-pkgs
-apt-get -y install wireguard nftables
+apt-get -y install wireguard nftables jq
 apt-get -y autoremove --purge
 
 cat >> /home/sihde/.ssh/authorized_keys <<EOF
@@ -29,7 +29,7 @@ mkdir -p /etc/wireguard
 umask 0077
 wg genkey > /etc/wireguard/wg0.key
 
-hostname=hamachi-vpn-uk.uksouth.cloudapp.azure.com
+hostname=$(curl -s -H Metadata:true http://169.254.169.254/metadata/instance?api-version=2021-02-01 | jq -r '.compute.osProfile.computerName+"."+.compute.location').cloudapp.azure.com
 port=51820
 
 cat > /etc/wireguard/wg0.conf <<EOF
