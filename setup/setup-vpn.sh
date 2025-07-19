@@ -68,9 +68,12 @@ Endpoint = ${hostname}:${port}
 EOF
 done
 
-systemctl enable wg-quick@wg0.service
+echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/50-ipforward.conf
+systemctl restart systemd-systemctl.service
 
 cp nftables.conf /etc/nftables.conf
 systemctl enable nftables.service
+systemctl start nftables.service
 
-echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/50-ipforward.conf
+systemctl enable wg-quick@wg0.service
+systemctl start wg-quick@wg0.service
