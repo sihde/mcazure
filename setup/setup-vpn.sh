@@ -69,7 +69,7 @@ EOF
 done
 
 echo 'net.ipv4.ip_forward=1' > /etc/sysctl.d/50-ipforward.conf
-systemctl restart systemd-systemctl.service
+systemctl restart systemd-sysctl.service
 
 cp nftables.conf /etc/nftables.conf
 systemctl enable nftables.service
