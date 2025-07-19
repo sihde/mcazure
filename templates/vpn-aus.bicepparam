@@ -1,0 +1,6 @@
+using './vpn.bicep'
+param projectName = 'vpn-aus'
+param location = 'australiaeast'
+param adminUsername = 'sihde'
+param adminPublicKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhEFbOq9jVxUFM6aa7tvCxsaNn2JoVbpwkCntJzGeM1liiVllXAQaaQeJq/aZurQRPSZTEKOjV57cWTzn9/RsknXFPIWZK9ISFyEDE5WgBJGvA/6qBNV2ydH6V+1ue04Mk1Hx5qiK0HQN0UVMDP/zcFVVEdzt1r1a0iipvVLZSm7T8rOeCxlw78XLxtZ9JnRpJ2xcrDLWX6xg9SwiWhp+DcqPlAIln3+V2LE1nYVVEG8yHAr8H0H9nCaHdx0L1/sKxWS2+lDZ5H+siCh89nYk1vwRm5r0Vof4Vn34s6VlXbDz1/Dc9KsAfMFdBXEGIv9Rjs+4KGMJAL9hA5ysS/vkR sihde@sihde-mn1'
+param vmSize = 'Standard_B2S'
