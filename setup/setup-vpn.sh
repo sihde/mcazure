@@ -12,7 +12,7 @@ echo sysstat sysstat/enable boolean true | debconf-set-selections
 # Install and upgrade packages
 apt-get update
 apt-get -y upgrade --with-new-pkgs
-apt-get -y install wireguard nftables jq
+apt-get -y install wireguard nftables jq qrencode
 apt-get -y autoremove --purge
 
 cat >> /home/sihde/.ssh/authorized_keys <<EOF
@@ -56,6 +56,7 @@ AllowedIPs = ${address}/32
 EOF
 
     cat > /etc/wireguard/${client}.conf <<EOF
+# To generate QR code: qrencode -t ansiutf8 < FILE
 [Interface]
 PrivateKey = $(cat /etc/wireguard/${client}.key)
 Address = ${address}/24
